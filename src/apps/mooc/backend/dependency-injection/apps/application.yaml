@@ -1,4 +1,21 @@
 services:
+  Contexts.mooc.Shared.EventBus:
+    class: ../../../../../Contexts/Shared/infrastructure/eventBus/InMemoryAsyncEventBus
+
+  Contexts.mooc.Shared.DomainEventSubscribers:
+    class: ../../../../../Contexts/Shared/infrastructure/eventBus/NodeDependencyInjectionDomainEventSubscribers
+
+  Contexts.mooc.courses.CourseRepository:
+    class: ../../../../../Contexts/Mooc/Courses/infrastructure/InMemoryCourseRepository
+
+  Contexts.mooc.courses.CourseCreator:
+    class: ../../../../../Contexts/Mooc/Courses/application/CourseCreator
+    arguments: ['@Contexts.mooc.courses.CourseRepository', '@Contexts.mooc.Shared.EventBus']
+
+  Contexts.mooc.courses.LogCourseOnCourseCreated:
+    class: ../../../../../Contexts/Mooc/Courses/application/LogCourseOnCourseCreated
+    tags:
+      - { name: domainEventSubscriber }
 
   Apps.mooc.controllers.StatusGetController:
     class: ../../controllers/StatusGetController
@@ -6,4 +23,4 @@ services:
 
   Apps.mooc.controllers.CoursePutController:
     class: ../../controllers/CoursePutController
-    arguments: [""]
+    arguments: ['@Contexts.mooc.courses.CourseCreator']

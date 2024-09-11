@@ -1,16 +1,26 @@
+import { EventBus } from '../../../Shared/domain/eventBus/EventBus';
 import { Course } from '../domain/Course';
+import { CourseAlreadyExists } from '../domain/CourseAlreadyExists';
 import { CourseRepository } from '../domain/CourseRepository';
 
 export class CourseCreator {
-	private readonly repository: CourseRepository;
-
-	constructor(repository: CourseRepository) {
-		this.repository = repository;
-	}
+	constructor(private readonly repository: CourseRepository, private readonly eventBus: EventBus) {}
 
 	async run(id: string, name: string, duration: string): Promise<void> {
-		const course = new Course({ id, name, duration });
+		await this.ensureCourseDoesNotExist(id);
 
-		return this.repository.save(course);
+		const course = Course.create({ id, name, duration });
+
+		await this.repository.save(course);
+
+		return this.eventBus.publish(course.pullDomainEvents());
+	}
+
+	private async ensureCourseDoesNotExist(id: string): Promise<void> {
+		const course = await this.repository.findById(id);
+
+		if (course) {
+			throw new CourseAlreadyExists(id);
+		}
 	}
 }
