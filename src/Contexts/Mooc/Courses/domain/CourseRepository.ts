@@ -2,7 +2,7 @@ import { Nullable } from '../../../Shared/domain/Nullable';
 import { Course } from './Course';
 
 export interface CourseRepository {
-	findById(id: string): Promise<Nullable<Course>>;
+	persist(course: Course): Promise<void>;
 
-	save(course: Course): Promise<void>;
+	findById(id: string): Promise<Nullable<Course>>;
 }

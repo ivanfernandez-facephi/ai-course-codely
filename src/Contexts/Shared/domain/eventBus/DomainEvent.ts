@@ -33,9 +33,9 @@ export abstract class DomainEvent {
 	}) {
 		const { aggregateId, eventName, eventId, occurredOn } = params;
 		this.aggregateId = aggregateId;
+		this.eventName = eventName;
 		this.eventId = eventId ?? UuidValueObject.random().value;
 		this.occurredOn = occurredOn ?? new Date();
-		this.eventName = eventName;
 	}
 
 	abstract toPrimitives(): DomainEventPrimitives<unknown>;

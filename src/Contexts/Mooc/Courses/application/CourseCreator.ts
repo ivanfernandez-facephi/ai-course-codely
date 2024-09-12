@@ -11,7 +11,7 @@ export class CourseCreator {
 
 		const course = Course.create({ id, name, duration });
 
-		await this.repository.save(course);
+		await this.repository.persist(course);
 
 		return this.eventBus.publish(course.pullDomainEvents());
 	}

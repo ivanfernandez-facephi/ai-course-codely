@@ -1,26 +1,52 @@
 services:
+  # Status
+  Apps.mooc.controllers.StatusGetController:
+    class: ../../controllers/StatusGetController
+    arguments: []
+
+  # Shared
   Contexts.mooc.Shared.EventBus:
     class: ../../../../../Contexts/Shared/infrastructure/eventBus/InMemoryAsyncEventBus
 
   Contexts.mooc.Shared.DomainEventSubscribers:
     class: ../../../../../Contexts/Shared/infrastructure/eventBus/NodeDependencyInjectionDomainEventSubscribers
 
+  # Courses
   Contexts.mooc.courses.CourseRepository:
-    class: ../../../../../Contexts/Mooc/Courses/infrastructure/InMemoryCourseRepository
+    class: ../../../../../Contexts/Mooc/Courses/infrastructure/MySqlCourseRepository
 
   Contexts.mooc.courses.CourseCreator:
     class: ../../../../../Contexts/Mooc/Courses/application/CourseCreator
     arguments: ['@Contexts.mooc.courses.CourseRepository', '@Contexts.mooc.Shared.EventBus']
 
-  Contexts.mooc.courses.LogCourseOnCourseCreated:
-    class: ../../../../../Contexts/Mooc/Courses/application/LogCourseOnCourseCreated
-    tags:
-      - { name: domainEventSubscriber }
-
-  Apps.mooc.controllers.StatusGetController:
-    class: ../../controllers/StatusGetController
-    arguments: []
+  Contexts.mooc.courses.CourseFinder:
+    class: ../../../../../Contexts/Mooc/Courses/application/CourseFinder
+    arguments: ['@Contexts.mooc.courses.CourseRepository']
 
   Apps.mooc.controllers.CoursePutController:
     class: ../../controllers/CoursePutController
     arguments: ['@Contexts.mooc.courses.CourseCreator']
+
+  Apps.mooc.controllers.CourseGetController:
+    class: ../../controllers/CourseGetController
+    arguments: ['@Contexts.mooc.courses.CourseFinder']
+
+  # Users
+  Contexts.mooc.users.UserRepository:
+    class: ../../../../../Contexts/Mooc/Users/infrastructure/MySqlUserRepository
+
+  Contexts.mooc.users.UserRegister:
+    class: ../../../../../Contexts/Mooc/Users/application/UserRegister
+    arguments: ['@Contexts.mooc.users.UserRepository', '@Contexts.mooc.Shared.EventBus']
+
+  Contexts.mooc.users.UserFinder:
+    class: ../../../../../Contexts/Mooc/Users/application/UserFinder
+    arguments: ['@Contexts.mooc.users.UserRepository']
+
+  Apps.mooc.controllers.UserPutController:
+    class: ../../controllers/UserPutController
+    arguments: ['@Contexts.mooc.users.UserRegister']
+
+  Apps.mooc.controllers.UserGetController:
+    class: ../../controllers/UserGetController
+    arguments: ['@Contexts.mooc.users.UserFinder']

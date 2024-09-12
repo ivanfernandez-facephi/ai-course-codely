@@ -1,20 +1,21 @@
 import { DomainEvent } from './eventBus/DomainEvent';
 
 export abstract class AggregateRoot {
-  private readonly domainEvents: DomainEvent[];
+	private readonly domainEvents: DomainEvent[];
 
-  constructor() {
-    this.domainEvents = [];
-  }
+	constructor() {
+		this.domainEvents = [];
+	}
 
-  record(event: DomainEvent): void {
-    this.domainEvents.push(event);
-  }
+	abstract toPrimitives(): Record<string, unknown>;
 
-  pullDomainEvents(): DomainEvent[] {
-    const domainEvents = this.domainEvents.splice(0);
-    return domainEvents;
-  }
+	record(event: DomainEvent): void {
+		this.domainEvents.push(event);
+	}
 
-  abstract toPrimitives(): any;
+	pullDomainEvents(): DomainEvent[] {
+		const domainEvents = this.domainEvents.splice(0);
+
+		return domainEvents;
+	}
 }
