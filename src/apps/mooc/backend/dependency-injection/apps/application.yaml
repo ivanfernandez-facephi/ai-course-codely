@@ -15,13 +15,17 @@ services:
   Contexts.mooc.courses.CourseRepository:
     class: ../../../../../Contexts/Mooc/Courses/infrastructure/MySqlCourseRepository
 
+  Contexts.mooc.courses.CourseFinderDomainService:
+    class: ../../../../../Contexts/Mooc/Courses/domain/CourseFinderDomainService
+    arguments: ['@Contexts.mooc.courses.CourseRepository']
+
   Contexts.mooc.courses.CourseCreator:
     class: ../../../../../Contexts/Mooc/Courses/application/CourseCreator
     arguments: ['@Contexts.mooc.courses.CourseRepository', '@Contexts.mooc.Shared.EventBus']
 
   Contexts.mooc.courses.CourseFinder:
     class: ../../../../../Contexts/Mooc/Courses/application/CourseFinder
-    arguments: ['@Contexts.mooc.courses.CourseRepository']
+    arguments: ['@Contexts.mooc.courses.CourseFinderDomainService']
 
   Apps.mooc.controllers.CoursePutController:
     class: ../../controllers/CoursePutController
@@ -35,13 +39,41 @@ services:
   Contexts.mooc.users.UserRepository:
     class: ../../../../../Contexts/Mooc/Users/infrastructure/MySqlUserRepository
 
+  Contexts.mooc.users.UserFinderDomainService:
+    class: ../../../../../Contexts/Mooc/Users/domain/UserFinderDomainService
+    arguments: ['@Contexts.mooc.users.UserRepository']
+
   Contexts.mooc.users.UserRegister:
     class: ../../../../../Contexts/Mooc/Users/application/UserRegister
     arguments: ['@Contexts.mooc.users.UserRepository', '@Contexts.mooc.Shared.EventBus']
 
   Contexts.mooc.users.UserFinder:
     class: ../../../../../Contexts/Mooc/Users/application/UserFinder
-    arguments: ['@Contexts.mooc.users.UserRepository']
+    arguments: ['@Contexts.mooc.users.UserFinderDomainService']
+
+  Contexts.mooc.users.UserCourseFinisher:
+    class: ../../../../../Contexts/Mooc/Users/application/UserCourseFinisher
+    arguments:
+      [
+        '@Contexts.mooc.users.UserRepository',
+        '@Contexts.mooc.users.UserFinderDomainService',
+        '@Contexts.mooc.courses.CourseFinder',
+        '@Contexts.mooc.Shared.EventBus'
+      ]
+
+  Contexts.mooc.users.UserSuggestedCourseGeneratorDomainService:
+    class: ../../../../../Contexts/Mooc/Users/infrastructure/OllamaMistralUserSuggestedCourseGeneratorDomainService
+
+  Contexts.mooc.users.GenerateSuggestedUserCourseOnUserCourseFinished:
+    class: ../../../../../Contexts/Mooc/Users/application/GenerateSuggestedUserCourseOnUserCourseFinished
+    arguments:
+      [
+        '@Contexts.mooc.users.UserSuggestedCourseGeneratorDomainService',
+        '@Contexts.mooc.users.UserFinderDomainService',
+        '@Contexts.mooc.users.UserRepository'
+      ]
+    tags:
+      - { name: domainEventSubscriber }
 
   Apps.mooc.controllers.UserPutController:
     class: ../../controllers/UserPutController
@@ -50,3 +82,7 @@ services:
   Apps.mooc.controllers.UserGetController:
     class: ../../controllers/UserGetController
     arguments: ['@Contexts.mooc.users.UserFinder']
+
+  Apps.mooc.controllers.UserPostFinishCourseController:
+    class: ../../controllers/UserPostFinishCourseController
+    arguments: ['@Contexts.mooc.users.UserCourseFinisher']

@@ -19,7 +19,7 @@ export class MySqlCourseRepository extends MySqlRepository<Course> implements Co
 		const query = `
 			CREATE TABLE IF NOT EXISTS ${this.TABLE_NAME} (
 				id VARCHAR(36) PRIMARY KEY,
-				name VARCHAR(100) NOT NULL,
+				name VARCHAR(100) NOT NULL UNIQUE,
 				duration VARCHAR(100) NOT NULL,
 				createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 			)

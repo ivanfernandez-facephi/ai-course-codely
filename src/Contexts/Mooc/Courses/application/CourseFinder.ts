@@ -1,17 +1,10 @@
 import { Course } from '../domain/Course';
-import { CourseNotFound } from '../domain/CourseNotFound';
-import { CourseRepository } from '../domain/CourseRepository';
+import { CourseFinderDomainService } from '../domain/CourseFinderDomainService';
 
 export class CourseFinder {
-	constructor(private readonly repository: CourseRepository) {}
+	constructor(private readonly finderDomainService: CourseFinderDomainService) {}
 
 	async run(id: string): Promise<Course> {
-		const course = await this.repository.findById(id);
-
-		if (!course) {
-			throw new CourseNotFound(id);
-		}
-
-		return course;
+		return this.finderDomainService.run(id);
 	}
 }

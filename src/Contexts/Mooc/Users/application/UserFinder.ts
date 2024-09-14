@@ -1,17 +1,10 @@
 import { User } from '../domain/User';
-import { UserNotFound } from '../domain/UserNotFound';
-import { UserRepository } from '../domain/UserRepository';
+import { UserFinderDomainService } from '../domain/UserFinderDomainService';
 
 export class UserFinder {
-	constructor(private readonly repository: UserRepository) {}
+	constructor(private readonly finderDomainService: UserFinderDomainService) {}
 
 	async run(id: string): Promise<User> {
-		const user = await this.repository.findById(id);
-
-		if (!user) {
-			throw new UserNotFound(id);
-		}
-
-		return user;
+		return this.finderDomainService.run(id);
 	}
 }

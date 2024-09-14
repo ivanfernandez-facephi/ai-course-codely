@@ -22,6 +22,7 @@ export class MySqlUserRepository extends MySqlRepository<User> implements UserRe
 				name VARCHAR(100) NOT NULL,
 				email VARCHAR(100) NOT NULL,
 				suggestedCourses JSON,
+				finishedCourses JSON,
 				createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 			)
 		`;

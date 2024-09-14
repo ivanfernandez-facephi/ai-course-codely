@@ -1,66 +1,58 @@
 import { DomainEvent, DomainEventPrimitives } from '../../../Shared/domain/eventBus/DomainEvent';
 
-export type UserCreatedAttributes = {
-	name: string;
-	email: string;
+export type UserCourseFinishedDomainEventAttributes = {
+	courseName: string;
 };
 
-export class UserCreatedDomainEvent extends DomainEvent {
-	static readonly EVENT_NAME = 'mooc.user.created';
+export class UserCourseFinishedDomainEvent extends DomainEvent {
+	static readonly EVENT_NAME = 'mooc.user.course.finished';
 
-	readonly name: string;
-
-	readonly email: string;
+	readonly courseName: string;
 
 	constructor({
 		aggregateId,
 		eventName,
 		eventId,
 		occurredOn,
-		name,
-		email
+		courseName
 	}: {
 		aggregateId: string;
 		eventName?: string;
 		eventId?: string;
 		occurredOn?: Date;
-		name: string;
-		email: string;
+		courseName: string;
 	}) {
 		super({
 			aggregateId,
 			// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-			eventName: eventName || UserCreatedDomainEvent.EVENT_NAME,
+			eventName: eventName || UserCourseFinishedDomainEvent.EVENT_NAME,
 			eventId,
 			occurredOn
 		});
 
-		this.name = name;
-		this.email = email;
+		this.courseName = courseName;
 	}
 
 	static fromPrimitives(
-		params: DomainEventPrimitives<UserCreatedAttributes>
-	): UserCreatedDomainEvent {
-		return new UserCreatedDomainEvent({
+		params: DomainEventPrimitives<UserCourseFinishedDomainEventAttributes>
+	): UserCourseFinishedDomainEvent {
+		return new UserCourseFinishedDomainEvent({
 			aggregateId: params.aggregateId,
 			eventName: params.eventName,
 			eventId: params.eventId,
 			occurredOn: params.occurredOn,
-			name: params.attributes.name,
-			email: params.attributes.email
+			courseName: params.attributes.courseName
 		});
 	}
 
-	toPrimitives(): DomainEventPrimitives<UserCreatedAttributes> {
+	toPrimitives(): DomainEventPrimitives<UserCourseFinishedDomainEventAttributes> {
 		return {
 			aggregateId: this.aggregateId,
 			eventId: this.eventId,
 			eventName: this.eventName,
 			occurredOn: this.occurredOn,
 			attributes: {
-				name: this.name,
-				email: this.email
+				courseName: this.courseName
 			}
 		};
 	}

@@ -1,4 +1,6 @@
 import { AggregateRoot } from '../../../Shared/domain/AggregateRoot';
+import { UserCourseAlreadyFinished } from './UserCourseAlreadyFinished';
+import { UserCourseFinishedDomainEvent } from './UserCourseFinishedDomainEvent';
 import { UserCreatedDomainEvent } from './UserCreatedDomainEvent';
 
 export type UserPrimitives = {
@@ -6,6 +8,7 @@ export type UserPrimitives = {
 	name: string;
 	email: string;
 	suggestedCourses: string[];
+	finishedCourses: string[];
 };
 
 export class User extends AggregateRoot {
@@ -17,20 +20,28 @@ export class User extends AggregateRoot {
 
 	private readonly _suggestedCourses: string[];
 
+	private readonly _finishedCourses: string[];
+
 	public get suggestedCourses(): string[] {
 		return [...this._suggestedCourses];
+	}
+
+	public get finishedCourses(): string[] {
+		return [...this._finishedCourses];
 	}
 
 	constructor({
 		id,
 		name,
 		email,
-		suggestedCourses
+		suggestedCourses,
+		finishedCourses
 	}: {
 		id: string;
 		name: string;
 		email: string;
 		suggestedCourses: string[];
+		finishedCourses: string[];
 	}) {
 		super();
 
@@ -38,17 +49,17 @@ export class User extends AggregateRoot {
 		this.name = name;
 		this.email = email;
 		this._suggestedCourses = suggestedCourses;
+		this._finishedCourses = finishedCourses;
 	}
 
 	static register({ id, name, email }: { id: string; name: string; email: string }): User {
-		const user = new User({ id, name, email, suggestedCourses: [] });
+		const user = new User({ id, name, email, suggestedCourses: [], finishedCourses: [] });
 
 		user.record(
 			new UserCreatedDomainEvent({
 				aggregateId: user.id,
 				name: user.name,
-				email: user.email,
-				suggestedCourses: user.suggestedCourses
+				email: user.email
 			})
 		);
 
@@ -66,7 +77,39 @@ export class User extends AggregateRoot {
 			id: this.id,
 			name: this.name,
 			email: this.email,
-			suggestedCourses: [...this.suggestedCourses]
+			suggestedCourses: this.suggestedCourses,
+			finishedCourses: this.finishedCourses
 		};
+	}
+
+	finishCourse(courseName: string): User {
+		const isCourseAlreadyFinished = this.finishedCourses.find(name => name === courseName);
+
+		if (isCourseAlreadyFinished) {
+			throw new UserCourseAlreadyFinished({ id: this.id, courseName });
+		}
+
+		const user = new User({
+			...this.toPrimitives(),
+			finishedCourses: [...this.finishedCourses, courseName]
+		});
+
+		user.record(
+			new UserCourseFinishedDomainEvent({
+				aggregateId: user.id,
+				courseName
+			})
+		);
+
+		return user;
+	}
+
+	updateSuggestedCourses(newCourseNames: string[]): User {
+		const user = new User({
+			...this.toPrimitives(),
+			suggestedCourses: [...this.suggestedCourses, ...newCourseNames]
+		});
+
+		return user;
 	}
 }
