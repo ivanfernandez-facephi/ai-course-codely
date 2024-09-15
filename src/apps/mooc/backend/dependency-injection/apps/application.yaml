@@ -70,7 +70,8 @@ services:
       [
         '@Contexts.mooc.users.UserSuggestedCourseGeneratorDomainService',
         '@Contexts.mooc.users.UserFinderDomainService',
-        '@Contexts.mooc.users.UserRepository'
+        '@Contexts.mooc.users.UserRepository',
+        '@Contexts.mooc.courses.CourseCreator'
       ]
     tags:
       - { name: domainEventSubscriber }
