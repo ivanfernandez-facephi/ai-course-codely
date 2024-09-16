@@ -1,6 +1,4 @@
 import { AggregateRoot } from '../../../Shared/domain/AggregateRoot';
-import { UserCourseAlreadyFinished } from './UserCourseAlreadyFinished';
-import { UserCourseFinishedDomainEvent } from './UserCourseFinishedDomainEvent';
 import { UserCreatedDomainEvent } from './UserCreatedDomainEvent';
 
 export type UserPrimitives = {
@@ -82,24 +80,11 @@ export class User extends AggregateRoot {
 		};
 	}
 
-	finishCourse(courseName: string): User {
-		const isCourseAlreadyFinished = this.finishedCourses.find(name => name === courseName);
-
-		if (isCourseAlreadyFinished) {
-			throw new UserCourseAlreadyFinished({ id: this.id, courseName });
-		}
-
+	updateFinishedCourses(courseName: string): User {
 		const user = new User({
 			...this.toPrimitives(),
 			finishedCourses: [...this.finishedCourses, courseName]
 		});
-
-		user.record(
-			new UserCourseFinishedDomainEvent({
-				aggregateId: user.id,
-				courseName
-			})
-		);
 
 		return user;
 	}

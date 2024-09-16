@@ -1,26 +1,40 @@
 import { DomainEvent, DomainEventPrimitives } from '../../../Shared/domain/eventBus/DomainEvent';
 
 export type UserCourseFinishedDomainEventAttributes = {
+	userId: string;
 	courseName: string;
+	previousFinishedCourses: string[];
 };
 
 export class UserCourseFinishedDomainEvent extends DomainEvent {
-	static readonly EVENT_NAME = 'mooc.user.course.finished';
+	static readonly EVENT_NAME = 'mooc.usercourse.finished';
+
+	readonly userId: string;
 
 	readonly courseName: string;
+
+	private readonly _previousFinishedCourses: string[];
+
+	public get previousFinishedCourses(): string[] {
+		return [...this._previousFinishedCourses];
+	}
 
 	constructor({
 		aggregateId,
 		eventName,
 		eventId,
 		occurredOn,
-		courseName
+		userId,
+		courseName,
+		previousFinishedCourses
 	}: {
 		aggregateId: string;
 		eventName?: string;
 		eventId?: string;
 		occurredOn?: Date;
+		userId: string;
 		courseName: string;
+		previousFinishedCourses: string[];
 	}) {
 		super({
 			aggregateId,
@@ -30,7 +44,9 @@ export class UserCourseFinishedDomainEvent extends DomainEvent {
 			occurredOn
 		});
 
+		this.userId = userId;
 		this.courseName = courseName;
+		this._previousFinishedCourses = previousFinishedCourses;
 	}
 
 	static fromPrimitives(
@@ -41,7 +57,9 @@ export class UserCourseFinishedDomainEvent extends DomainEvent {
 			eventName: params.eventName,
 			eventId: params.eventId,
 			occurredOn: params.occurredOn,
-			courseName: params.attributes.courseName
+			userId: params.attributes.userId,
+			courseName: params.attributes.courseName,
+			previousFinishedCourses: [...params.attributes.previousFinishedCourses]
 		});
 	}
 
@@ -52,7 +70,9 @@ export class UserCourseFinishedDomainEvent extends DomainEvent {
 			eventName: this.eventName,
 			occurredOn: this.occurredOn,
 			attributes: {
-				courseName: this.courseName
+				userId: this.userId,
+				courseName: this.courseName,
+				previousFinishedCourses: this.previousFinishedCourses
 			}
 		};
 	}

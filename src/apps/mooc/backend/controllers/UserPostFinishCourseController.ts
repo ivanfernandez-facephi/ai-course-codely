@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 
-import { UserCourseFinisher } from '../../../../Contexts/Mooc/Users/application/UserCourseFinisher';
+import { UserCourseFinisher } from '../../../../Contexts/Mooc/UserCourses/application/UserCourseFinisher';
 import { Controller } from './Controller';
 
 export class UserPostFinishCourseController implements Controller {
