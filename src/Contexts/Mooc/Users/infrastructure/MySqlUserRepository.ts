@@ -1,6 +1,7 @@
 import { Nullable } from '../../../Shared/domain/Nullable';
 import { MySqlRepository } from '../../../Shared/infrastructure/persistence/MySqlRepository';
 import { User } from '../domain/User';
+import { UserId } from '../domain/UserId';
 import { UserRepository } from '../domain/UserRepository';
 
 export class MySqlUserRepository extends MySqlRepository<User> implements UserRepository {
@@ -10,9 +11,9 @@ export class MySqlUserRepository extends MySqlRepository<User> implements UserRe
 		return this.saveOrUpdate(user);
 	}
 
-	async findById(id: string): Promise<Nullable<User>> {
+	async findById(id: UserId): Promise<Nullable<User>> {
 		// eslint-disable-next-line @typescript-eslint/unbound-method
-		return this.searchById(id, User.fromPrimitives);
+		return this.searchById(id.value, User.fromPrimitives);
 	}
 
 	async initialize(): Promise<void> {

@@ -2,6 +2,7 @@ import { DomainEventClass } from '../../../Shared/domain/eventBus/DomainEvent';
 import { DomainEventSubscriber } from '../../../Shared/domain/eventBus/DomainEventSubscriber';
 import { UserCourseFinishedDomainEvent } from '../../UserCourses/domain/UserCourseFinishedDomainEvent';
 import { UserFinderDomainService } from '../domain/UserFinderDomainService';
+import { UserId } from '../domain/UserId';
 import { UserRepository } from '../domain/UserRepository';
 
 export class UpdateFinishedCoursesOnUserCourseFinished implements DomainEventSubscriber {
@@ -15,7 +16,7 @@ export class UpdateFinishedCoursesOnUserCourseFinished implements DomainEventSub
 	}
 
 	async on(event: UserCourseFinishedDomainEvent): Promise<void> {
-		const user = await this.finderDomainService.run(event.userId);
+		const user = await this.finderDomainService.run(new UserId(event.userId));
 
 		const updatedUser = user.updateFinishedCourses(event.courseName);
 

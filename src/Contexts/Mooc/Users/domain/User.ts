@@ -1,5 +1,10 @@
 import { AggregateRoot } from '../../../Shared/domain/AggregateRoot';
 import { UserCreatedDomainEvent } from './UserCreatedDomainEvent';
+import { UserEmail } from './UserEmail';
+import { UserFinishedCourses } from './UserFinishedCourses';
+import { UserId } from './UserId';
+import { UserName } from './UserName';
+import { UserSuggestedCourses } from './UserSuggestedCourses';
 
 export type UserPrimitives = {
 	id: string;
@@ -10,22 +15,22 @@ export type UserPrimitives = {
 };
 
 export class User extends AggregateRoot {
-	readonly id: string;
+	readonly id: UserId;
 
-	readonly name: string;
+	readonly name: UserName;
 
-	readonly email: string;
+	readonly email: UserEmail;
 
-	private readonly _suggestedCourses: string[];
+	private readonly _suggestedCourses: UserSuggestedCourses;
 
-	private readonly _finishedCourses: string[];
+	private readonly _finishedCourses: UserFinishedCourses;
 
-	public get suggestedCourses(): string[] {
-		return [...this._suggestedCourses];
+	public get suggestedCourses(): UserSuggestedCourses {
+		return new UserSuggestedCourses(this._suggestedCourses.items);
 	}
 
-	public get finishedCourses(): string[] {
-		return [...this._finishedCourses];
+	public get finishedCourses(): UserFinishedCourses {
+		return new UserFinishedCourses(this._finishedCourses.items);
 	}
 
 	constructor({
@@ -35,11 +40,11 @@ export class User extends AggregateRoot {
 		suggestedCourses,
 		finishedCourses
 	}: {
-		id: string;
-		name: string;
-		email: string;
-		suggestedCourses: string[];
-		finishedCourses: string[];
+		id: UserId;
+		name: UserName;
+		email: UserEmail;
+		suggestedCourses: UserSuggestedCourses;
+		finishedCourses: UserFinishedCourses;
 	}) {
 		super();
 
@@ -50,14 +55,20 @@ export class User extends AggregateRoot {
 		this._finishedCourses = finishedCourses;
 	}
 
-	static register({ id, name, email }: { id: string; name: string; email: string }): User {
-		const user = new User({ id, name, email, suggestedCourses: [], finishedCourses: [] });
+	static register({ id, name, email }: { id: UserId; name: UserName; email: UserEmail }): User {
+		const user = new User({
+			id,
+			name,
+			email,
+			suggestedCourses: UserSuggestedCourses.empty(),
+			finishedCourses: UserFinishedCourses.empty()
+		});
 
 		user.record(
 			new UserCreatedDomainEvent({
-				aggregateId: user.id,
-				name: user.name,
-				email: user.email
+				aggregateId: user.id.value,
+				name: user.name.value,
+				email: user.email.value
 			})
 		);
 
@@ -66,33 +77,37 @@ export class User extends AggregateRoot {
 
 	static fromPrimitives(plainData: UserPrimitives): User {
 		return new User({
-			...plainData
+			id: new UserId(plainData.id),
+			name: new UserName(plainData.name),
+			email: new UserEmail(plainData.email),
+			suggestedCourses: new UserSuggestedCourses(plainData.suggestedCourses),
+			finishedCourses: new UserFinishedCourses(plainData.finishedCourses)
 		});
 	}
 
 	toPrimitives(): UserPrimitives {
 		return {
-			id: this.id,
-			name: this.name,
-			email: this.email,
-			suggestedCourses: this.suggestedCourses,
-			finishedCourses: this.finishedCourses
+			id: this.id.value,
+			name: this.name.value,
+			email: this.email.value,
+			suggestedCourses: this.suggestedCourses.items,
+			finishedCourses: this.finishedCourses.items
 		};
 	}
 
 	updateFinishedCourses(courseName: string): User {
-		const user = new User({
+		const user = User.fromPrimitives({
 			...this.toPrimitives(),
-			finishedCourses: [...this.finishedCourses, courseName]
+			finishedCourses: this._finishedCourses.add(courseName).items
 		});
 
 		return user;
 	}
 
 	updateSuggestedCourses(newCourseNames: string[]): User {
-		const user = new User({
+		const user = User.fromPrimitives({
 			...this.toPrimitives(),
-			suggestedCourses: [...this.suggestedCourses, ...newCourseNames]
+			suggestedCourses: this._suggestedCourses.add(...newCourseNames).items
 		});
 
 		return user;

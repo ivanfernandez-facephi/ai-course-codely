@@ -1,1 +1,1 @@
-POST http://localhost:5000/users/6343b2b7-f09b-4155-ab15-d6fe620a256f/courses/bd864fc1-9aac-4446-a8b0-f49ddecc75c3/finish
+POST http://localhost:5000/users/6343b2b7-f09b-4155-ab15-d6fe620a256f/courses/dd351ea4-04f7-42b4-ac1e-6e53efcd651b/finish

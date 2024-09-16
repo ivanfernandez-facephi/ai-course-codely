@@ -17,10 +17,10 @@ export class UserCourseFinisher {
 		]);
 
 		const updatedCourse = UserCourse.finish({
-			userId: user.id,
+			userId: user.id.value,
 			courseId: course.id,
 			courseName: course.name,
-			previousFinishedCourses: user.finishedCourses
+			previousFinishedCourses: user.finishedCourses.items
 		});
 
 		await this.eventBus.publish(updatedCourse.pullDomainEvents());
